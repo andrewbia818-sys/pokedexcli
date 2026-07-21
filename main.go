@@ -7,6 +7,12 @@ import (
 )
 
 func main() {
+	// Create a cfg that has a persistent state for the REPL loop
+	var cfg *Config
+	cfg = &Config{
+		nextPageURL: "",
+		prevPageURL: "",
+	}
 	// Create a new scanner to read from standard input
 	scanner := bufio.NewScanner(os.Stdin)
 	// Start an infinite for loop that  will execute once for
@@ -32,7 +38,7 @@ func main() {
 			fmt.Println("Unknown command")
 			continue
 		}
-		err := command.callback()
+		err := command.callback(cfg)
 		if err != nil {
 			fmt.Println(err)
 		}
