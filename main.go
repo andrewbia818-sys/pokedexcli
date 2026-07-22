@@ -4,14 +4,15 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"pokedexcli/internal/pokeapi"
 )
 
 func main() {
 	// Create a cfg that has a persistent state for the REPL loop
-	var cfg *Config
-	cfg = &Config{
-		nextPageURL: "",
-		prevPageURL: "",
+	var cfg *pokeapi.Config
+	cfg = &pokeapi.Config{
+		NextPageURL: "",
+		PrevPageURL: "",
 	}
 	// Create a new scanner to read from standard input
 	scanner := bufio.NewScanner(os.Stdin)
