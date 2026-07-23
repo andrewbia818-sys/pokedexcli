@@ -30,7 +30,8 @@ func commandExit(cfg *pokeapi.Config) error {
 
 // Add a help command function.
 func commandHelp(cfg *pokeapi.Config) error {
-	fmt.Println("Welcome to the Pokedex!\nUsage:\n")
+	fmt.Println("Welcome to the Pokedex!\nUsage:")
+	fmt.Println()
 	fmt.Println("exit: Exit the Pokedex")
 	fmt.Println("help: Displays a help message")
 	fmt.Println("map: Display 20 location areas in the Pokemon world")

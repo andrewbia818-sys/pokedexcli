@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 	"pokedexcli/internal/pokeapi"
+	"pokedexcli/internal/pokecache"
+	"time"
 )
 
 func main() {
@@ -13,7 +15,9 @@ func main() {
 	cfg = &pokeapi.Config{
 		NextPageURL: "",
 		PrevPageURL: "",
+		Cache:       pokecache.NewCache(20 * time.Second),
 	}
+
 	// Create a new scanner to read from standard input
 	scanner := bufio.NewScanner(os.Stdin)
 	// Start an infinite for loop that  will execute once for
@@ -24,6 +28,9 @@ func main() {
 		fmt.Print("Pokedex > ")
 		// Read a line from standard input
 		if !scanner.Scan() {
+			if err := scanner.Err(); err != nil {
+				fmt.Fprintln(os.Stderr, "Error reading input:", err)
+			}
 			break
 		}
 		// Get the text from the scanner

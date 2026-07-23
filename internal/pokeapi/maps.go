@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"pokedexcli/internal/pokecache"
 )
 
 // Create a struct to hold the configuration for the CLI.
@@ -13,6 +14,7 @@ type Config struct {
 	// Add any configuration fields you need here
 	NextPageURL string
 	PrevPageURL string
+	Cache       *pokecache.Cache
 }
 
 // Define a struct to represent the response from the PokeAPI for location areas.
@@ -34,12 +36,33 @@ func CommandMap(cfg *Config) error {
 	if cfg.NextPageURL != "" {
 		url = cfg.NextPageURL
 	}
-	// Make a GET request to the PokeAPI to retrieve location areas
+	// Add caching to the CommandMap function.
+	var cache *pokecache.Cache
+	//	cache = pokecache.NewCache(5 * time.Second)
+	cache = cfg.Cache
+	// check if the response for the URL is already in the cache
+	if val, ok := cache.Get(url); ok {
+		// if it is, use that instead of making a new request
+		fmt.Println("Using cached response for URL:", url)
+		var locationAreaResponse LocationAreaResponse
+		err := json.Unmarshal(val, &locationAreaResponse)
+		if err != nil {
+			log.Fatal(err)
+		}
+		cfg.NextPageURL = locationAreaResponse.Next
+		cfg.PrevPageURL = locationAreaResponse.Previous
+		for _, area := range locationAreaResponse.Results {
+			fmt.Println("- " + area.Name)
+		}
+		return nil
+	}
+
 	res, err := http.Get(url)
 	if err != nil {
 		log.Fatal(err)
 	}
 	body, err := io.ReadAll(res.Body)
+
 	res.Body.Close()
 	if res.StatusCode > 299 {
 		log.Fatalf("Response failed with status code: %d and\nbody: %s\n", res.StatusCode, body)
@@ -47,10 +70,11 @@ func CommandMap(cfg *Config) error {
 	if err != nil {
 		log.Fatal(err)
 	}
-	//fmt.Printf("%s", body)
-
+	// Add the response to the cache
+	cache.Add(url, body)
 	// parse the JSON response to extract the next and previous URLs
 	// and store them in the cfg struct for future calls.
+
 	var locationAreaResponse LocationAreaResponse
 	err = json.Unmarshal(body, &locationAreaResponse)
 	if err != nil {
@@ -58,9 +82,6 @@ func CommandMap(cfg *Config) error {
 	}
 	cfg.NextPageURL = locationAreaResponse.Next
 	cfg.PrevPageURL = locationAreaResponse.Previous
-	//fmt.Printf("Next page URL: %s\n", cfg.NextPageURL)
-	//fmt.Printf("Previous page URL: %s\n", cfg.PrevPageURL)
-	//fmt.Println("Location Areas:")
 	for _, area := range locationAreaResponse.Results {
 		fmt.Println("- " + area.Name)
 	}
@@ -75,6 +96,24 @@ func CommandMapb(cfg *Config) error {
 	if cfg.PrevPageURL != "" {
 		url = cfg.PrevPageURL
 	}
+	var cache *pokecache.Cache
+	cache = cfg.Cache
+	// check if the response for the URL is already in the cache
+	if val, ok := cache.Get(url); ok {
+		// if it is, use that instead of making a new request
+		//	fmt.Println("Using cached response for URL:", url)
+		var locationAreaResponse LocationAreaResponse
+		err := json.Unmarshal(val, &locationAreaResponse)
+		if err != nil {
+			log.Fatal(err)
+		}
+		cfg.NextPageURL = locationAreaResponse.Next
+		cfg.PrevPageURL = locationAreaResponse.Previous
+		for _, area := range locationAreaResponse.Results {
+			fmt.Println("- " + area.Name)
+		}
+		return nil
+	}
 	// Make a GET request to the PokeAPI to retrieve location areas
 	res, err := http.Get(url)
 	if err != nil {
@@ -88,7 +127,8 @@ func CommandMapb(cfg *Config) error {
 	if err != nil {
 		log.Fatal(err)
 	}
-
+	// Add the response to the cache
+	cache.Add(url, body)
 	// parse the JSON response to extract the next and previous URLs
 	// and store them in the cfg struct for future calls.
 	var locationAreaResponse LocationAreaResponse
