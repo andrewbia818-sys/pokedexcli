@@ -19,8 +19,10 @@ func cleanInput(text string) []string {
 	return words
 }
 
+//err := command.callback(cfg, areaName)
+
 // Add an exit command function.
-func commandExit(cfg *pokeapi.Config) error {
+func commandExit(cfg *pokeapi.Config, areaName string) error {
 	if len(words) > 0 && words[0] == "exit" {
 		fmt.Println("Closing the Pokedex... Goodbye!")
 		os.Exit(0)
@@ -29,13 +31,17 @@ func commandExit(cfg *pokeapi.Config) error {
 }
 
 // Add a help command function.
-func commandHelp(cfg *pokeapi.Config) error {
-	fmt.Println("Welcome to the Pokedex!\nUsage:")
-	fmt.Println()
-	fmt.Println("exit: Exit the Pokedex")
-	fmt.Println("help: Displays a help message")
-	fmt.Println("map: Display 20 location areas in the Pokemon world")
-	fmt.Println("mapb: Display the previous 20 location areas in the Pokemon world")
+func commandHelp(cfg *pokeapi.Config, areaName string) error {
+	if len(words) > 0 && words[0] == "help" {
+		fmt.Println("Welcome to the Pokedex!\nUsage:")
+		fmt.Println()
+		fmt.Println("exit: Exit the Pokedex")
+		fmt.Println("help: Displays a help message")
+		fmt.Println("map: Display 20 location areas in the Pokemon world")
+		fmt.Println("mapb: Display the previous 20 location areas in the Pokemon world")
+		fmt.Println("explore: Display the Pokemons present in the location area")
+		fmt.Println("catch: Attempt to catch a Pokemon by Throwing a Pokeball at it")
+	}
 	return nil
 }
 
@@ -43,7 +49,7 @@ func commandHelp(cfg *pokeapi.Config) error {
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*pokeapi.Config) error
+	callback    func(cfg *pokeapi.Config, areaName string) error
 }
 
 // Create a map to hold all the commands in the CLI.
@@ -67,5 +73,15 @@ var commands = map[string]cliCommand{
 		name:        "mapb",
 		description: "Display the previous 20 location areas in the Pokemon world",
 		callback:    pokeapi.CommandMapb,
+	},
+	"explore": {
+		name:        "explore",
+		description: "Display the Pokemons present in the location area",
+		callback:    pokeapi.CommandExplore,
+	},
+	"catch": {
+		name:        "catch",
+		description: "Attempt to catch a Pokemon by throwing a Pokeball at it",
+		callback:    pokeapi.CommandCatch,
 	},
 }

@@ -41,12 +41,17 @@ func main() {
 		if len(words) == 0 {
 			continue
 		}
+		//Update the REPL loop to set the second word as the areaName (if it exists)
+		var areaName string
+		if len(words) > 1 {
+			areaName = words[1]
+		}
 		command, exists := commands[words[0]]
 		if !exists {
 			fmt.Println("Unknown command")
 			continue
 		}
-		err := command.callback(cfg)
+		err := command.callback(cfg, areaName)
 		if err != nil {
 			fmt.Println(err)
 		}

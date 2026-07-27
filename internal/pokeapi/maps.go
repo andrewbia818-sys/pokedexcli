@@ -29,7 +29,7 @@ type LocationAreaResponse struct {
 }
 
 // should display the next 20 locations.
-func CommandMap(cfg *Config) error {
+func CommandMap(cfg *Config, areaName string) error {
 	// amend the URL to use the nextPageURL if it is set
 	var url string
 	url = "https://pokeapi.co/api/v2/location-area/?limit=20&offset=0"
@@ -43,7 +43,7 @@ func CommandMap(cfg *Config) error {
 	// check if the response for the URL is already in the cache
 	if val, ok := cache.Get(url); ok {
 		// if it is, use that instead of making a new request
-		fmt.Println("Using cached response for URL:", url)
+		//	fmt.Println("Using cached response for URL:", url)
 		var locationAreaResponse LocationAreaResponse
 		err := json.Unmarshal(val, &locationAreaResponse)
 		if err != nil {
@@ -89,7 +89,7 @@ func CommandMap(cfg *Config) error {
 }
 
 // Add commandMapb function. It does the same as commandMap but uses the previous page URL to get the previous 20 location areas.
-func CommandMapb(cfg *Config) error {
+func CommandMapb(cfg *Config, areaName string) error {
 	// amend the URL to use the prevPageURL if it is set
 	var url string
 	url = "https://pokeapi.co/api/v2/location-area/?limit=20&offset=0"
