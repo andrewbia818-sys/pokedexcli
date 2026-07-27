@@ -42,6 +42,7 @@ func commandHelp(cfg *pokeapi.Config, areaName string) error {
 		fmt.Println("explore: Display the Pokemons present in the location area")
 		fmt.Println("catch: Attempt to catch a Pokemon by Throwing a Pokeball at it")
 		fmt.Println("inspect: Display the details of a Pokemon you have caught")
+		fmt.Println("pokedex: Display the names of all the Pokemon you have caught")
 	}
 	return nil
 }
@@ -89,5 +90,10 @@ var commands = map[string]cliCommand{
 		name:        "inspect",
 		description: "Inspect a Pokemon in the cache by name",
 		callback:    pokeapi.CommandInspect,
+	},
+	"pokedex": {
+		name:        "inspect",
+		description: "Print all Pokemon names in the cache",
+		callback:    pokeapi.CommandPokedex,
 	},
 }
